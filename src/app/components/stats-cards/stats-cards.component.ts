@@ -71,6 +71,9 @@ import { InvoiceStats } from '../../models/invoice.model';
     @media (max-width: 768px) {
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
     }
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
+    }
     .stats-card {
       border-radius: 8px !important;
       border: 1px solid #e0e0e0 !important;

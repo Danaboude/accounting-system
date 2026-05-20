@@ -85,6 +85,11 @@ import { InvoiceFilters } from '../../models/invoice.model';
     mat-form-field {
       direction: rtl;
     }
+    @media (max-width: 600px) {
+      .filter-field, .filter-field-sm { min-width: 100%; flex: 1 1 100%; }
+      .action-btn { flex: 1 1 100%; }
+      .filters-container { padding: 12px; }
+    }
   `]
 })
 export class FiltersBarComponent {
