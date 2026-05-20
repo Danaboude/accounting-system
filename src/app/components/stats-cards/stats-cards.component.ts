@@ -9,80 +9,99 @@ import { InvoiceStats } from '../../models/invoice.model';
   standalone: true,
   imports: [CommonModule, MatCardModule, MatIconModule],
   template: `
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div class="stats-grid">
       <mat-card class="stats-card">
         <mat-card-content>
-          <div class="flex items-center justify-between">
+          <div class="card-inner">
             <div>
               <p class="stats-label">عدد الفواتير</p>
-              <p class="stats-value text-blue-700">{{ stats()?.totalCount ?? 0 }}</p>
+              <p class="stats-value">{{ stats()?.totalCount ?? 0 }}</p>
             </div>
-            <mat-icon class="stats-icon text-blue-400">receipt_long</mat-icon>
+            <mat-icon class="stats-icon">receipt_long</mat-icon>
           </div>
         </mat-card-content>
       </mat-card>
 
       <mat-card class="stats-card">
         <mat-card-content>
-          <div class="flex items-center justify-between">
+          <div class="card-inner">
             <div>
               <p class="stats-label">إجمالي المبيعات</p>
-              <p class="stats-value text-green-700">{{ (stats()?.totalAmount ?? 0) | number:'1.2-2' }}</p>
+              <p class="stats-value">{{ (stats()?.totalAmount ?? 0) | number:'1.2-2' }}</p>
             </div>
-            <mat-icon class="stats-icon text-green-400">attach_money</mat-icon>
+            <mat-icon class="stats-icon">attach_money</mat-icon>
           </div>
         </mat-card-content>
       </mat-card>
 
       <mat-card class="stats-card">
         <mat-card-content>
-          <div class="flex items-center justify-between">
+          <div class="card-inner">
             <div>
               <p class="stats-label">إجمالي المقبوضات</p>
-              <p class="stats-value text-emerald-700">{{ (stats()?.totalPaid ?? 0) | number:'1.2-2' }}</p>
+              <p class="stats-value">{{ (stats()?.totalPaid ?? 0) | number:'1.2-2' }}</p>
             </div>
-            <mat-icon class="stats-icon text-emerald-400">payments</mat-icon>
+            <mat-icon class="stats-icon">payments</mat-icon>
           </div>
         </mat-card-content>
       </mat-card>
 
-      <mat-card class="stats-card">
+      <mat-card class="stats-card" [class.debt-card]="(stats()?.totalDebt ?? 0) > 0">
         <mat-card-content>
-          <div class="flex items-center justify-between">
+          <div class="card-inner">
             <div>
               <p class="stats-label">إجمالي الديون</p>
-              <p class="stats-value" [class.text-red-700]="(stats()?.totalDebt ?? 0) > 0" [class.text-green-700]="(stats()?.totalDebt ?? 0) === 0">
+              <p class="stats-value" [class.debt-value]="(stats()?.totalDebt ?? 0) > 0">
                 {{ (stats()?.totalDebt ?? 0) | number:'1.2-2' }}
               </p>
             </div>
-            <mat-icon class="stats-icon" [class.text-red-400]="(stats()?.totalDebt ?? 0) > 0" [class.text-green-400]="(stats()?.totalDebt ?? 0) === 0">account_balance_wallet</mat-icon>
+            <mat-icon class="stats-icon" [class.debt-icon]="(stats()?.totalDebt ?? 0) > 0">account_balance_wallet</mat-icon>
           </div>
         </mat-card-content>
       </mat-card>
     </div>
   `,
   styles: [`
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
     .stats-card {
-      border-radius: 12px !important;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+      border-radius: 8px !important;
+      border: 1px solid #e0e0e0 !important;
+      box-shadow: none !important;
+    }
+    .card-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
     .stats-label {
       font-size: 0.78rem;
       color: #666;
-      margin-bottom: 4px;
-      font-family: 'Segoe UI', Tahoma, sans-serif;
+      margin: 0 0 6px 0;
     }
     .stats-value {
-      font-size: 1.5rem;
+      font-size: 1.45rem;
       font-weight: 700;
+      color: #111;
       line-height: 1;
+      margin: 0;
     }
     .stats-icon {
-      font-size: 2.5rem !important;
-      width: 2.5rem !important;
-      height: 2.5rem !important;
-      opacity: 0.6;
+      font-size: 2.2rem !important;
+      width: 2.2rem !important;
+      height: 2.2rem !important;
+      color: #999;
     }
+    .debt-card { border-color: #ffcdd2 !important; background: #fff8f8 !important; }
+    .debt-value { color: #c62828 !important; }
+    .debt-icon  { color: #e57373 !important; }
   `]
 })
 export class StatsCardsComponent {

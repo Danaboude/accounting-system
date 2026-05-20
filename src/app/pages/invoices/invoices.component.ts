@@ -42,29 +42,28 @@ import { InvoiceFormComponent } from '../../components/invoice-form/invoice-form
             <mat-icon class="header-icon">receipt_long</mat-icon>
             <div>
               <h1>نظام إدارة الفواتير</h1>
-              <p class="header-sub">Arabic Accounting System</p>
             </div>
           </div>
           <div class="header-actions">
-            <button mat-raised-button (click)="downloadTemplate()" class="btn-teal" matTooltip="تحميل نموذج Excel">
+            <button mat-stroked-button (click)="downloadTemplate()" matTooltip="تحميل نموذج Excel">
               <mat-icon>download</mat-icon>
-              تحميل النموذج
+              نموذج
             </button>
-            <button mat-raised-button (click)="triggerImport()" class="btn-orange" matTooltip="استيراد من Excel">
+            <button mat-stroked-button (click)="triggerImport()" matTooltip="استيراد من Excel">
               <mat-icon>upload_file</mat-icon>
-              استيراد Excel
+              استيراد
             </button>
-            <button mat-raised-button (click)="exportExcel()" class="btn-green" matTooltip="تصدير إلى Excel">
+            <button mat-stroked-button (click)="exportExcel()" matTooltip="تصدير إلى Excel">
               <mat-icon>table_view</mat-icon>
-              تصدير Excel
+              تصدير
             </button>
-            <button mat-raised-button (click)="printPDF()" class="btn-blue" matTooltip="طباعة PDF">
+            <button mat-stroked-button (click)="printPDF()" matTooltip="طباعة PDF">
               <mat-icon>print</mat-icon>
-              طباعة PDF
+              PDF
             </button>
-            <button mat-raised-button color="primary" (click)="openAddDialog()" class="btn-add">
+            <button mat-flat-button color="primary" (click)="openAddDialog()">
               <mat-icon>add</mat-icon>
-              إضافة فاتورة
+              فاتورة جديدة
             </button>
             <input #fileInput type="file" accept=".xlsx,.xls" style="display:none" (change)="onFileSelected($event)" />
           </div>
@@ -189,18 +188,12 @@ import { InvoiceFormComponent } from '../../components/invoice-form/invoice-form
     </div>
   `,
   styles: [`
-    .page-wrapper {
-      min-height: 100vh;
-      background: #f0f4f8;
-      direction: rtl;
-    }
+    .page-wrapper { min-height: 100vh; background: #f5f5f5; direction: rtl; }
 
     /* Header */
     .app-header {
-      background: linear-gradient(135deg, #006100 0%, #00820f 100%);
-      color: white;
-      padding: 0;
-      box-shadow: 0 2px 12px rgba(0,97,0,0.3);
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
       position: sticky;
       top: 0;
       z-index: 100;
@@ -208,160 +201,88 @@ import { InvoiceFormComponent } from '../../components/invoice-form/invoice-form
     .header-content {
       max-width: 1400px;
       margin: 0 auto;
-      padding: 16px 24px;
+      padding: 12px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 12px;
     }
-    .header-title {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .header-icon {
-      font-size: 2.5rem !important;
-      width: 2.5rem !important;
-      height: 2.5rem !important;
-      opacity: 0.9;
-    }
-    .header-title h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-    }
-    .header-sub {
-      font-size: 0.78rem;
-      opacity: 0.75;
-      margin: 2px 0 0;
-    }
-    .header-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    /* Button colors */
-    .btn-teal { background: #0097a7 !important; color: white !important; }
-    .btn-orange { background: #f57c00 !important; color: white !important; }
-    .btn-green { background: #2e7d32 !important; color: white !important; }
-    .btn-blue { background: #1565c0 !important; color: white !important; }
-    .btn-add { background: #43a047 !important; color: white !important; }
+    .header-title { display: flex; align-items: center; gap: 10px; }
+    .header-icon { font-size: 1.8rem !important; width: 1.8rem !important; height: 1.8rem !important; color: #111; }
+    .header-title h1 { font-size: 1.2rem; font-weight: 700; margin: 0; color: #111; }
+    .header-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 
     /* Page body */
-    .page-body {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 24px;
-    }
+    .page-body { max-width: 1400px; margin: 0 auto; padding: 20px 24px; }
 
     /* Table card */
     .table-card {
       background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
       overflow: hidden;
     }
     .table-toolbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 16px 20px;
+      padding: 14px 18px;
     }
     .table-count {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 1rem;
-      color: #006100;
+      gap: 6px;
+      font-size: 0.95rem;
+      color: #444;
       font-weight: 600;
     }
 
     /* States */
     .loading-state, .empty-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 60px 20px;
-      gap: 16px;
-      color: #888;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 60px 20px; gap: 16px; color: #999;
     }
     .empty-state mat-icon {
-      font-size: 4rem !important;
-      width: 4rem !important;
-      height: 4rem !important;
-      opacity: 0.3;
+      font-size: 4rem !important; width: 4rem !important;
+      height: 4rem !important; opacity: 0.25;
     }
 
     /* Table */
-    .table-wrapper {
-      overflow-x: auto;
-    }
-    .invoices-table {
-      width: 100%;
-      direction: rtl;
-    }
+    .table-wrapper { overflow-x: auto; }
+    .invoices-table { width: 100%; direction: rtl; }
 
-    /* Columns */
-    .col-num { width: 100px; text-align: center; }
-    .col-amount { width: 140px; text-align: left; }
-    .col-date { width: 120px; }
-    .col-actions { width: 100px; text-align: center; }
+    .col-num    { width: 110px; text-align: center; }
+    .col-amount { width: 140px; }
+    .col-date   { width: 115px; }
+    .col-actions{ width: 95px;  text-align: center; }
 
-    /* Cells */
     .invoice-num-badge {
-      background: #e8f5e9;
-      color: #006100;
+      background: #f0f0f0;
+      color: #111;
       padding: 2px 10px;
       border-radius: 20px;
       font-weight: 700;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
     }
-    .client-cell {
-      font-weight: 500;
-    }
-    .amount-cell {
-      font-family: monospace;
-      font-size: 0.95rem;
-    }
-    .paid-cell {
-      color: #2e7d32;
-      font-weight: 500;
-    }
+    .client-cell { font-weight: 600; }
+    .amount-cell { font-family: monospace; font-size: 0.93rem; }
+
     .debt-positive {
       background-color: #ffebee !important;
       color: #c62828 !important;
       font-weight: 700;
-      text-align: left;
     }
     .debt-zero {
-      background-color: #e8f5e9 !important;
-      color: #2e7d32 !important;
-      font-weight: 500;
-      text-align: left;
+      background-color: #f1f8e9 !important;
+      color: #388e3c !important;
     }
 
-    /* Header row */
-    :host ::ng-deep .mat-mdc-header-row {
-      background-color: #006100 !important;
-    }
-    :host ::ng-deep .mat-mdc-header-cell {
-      color: white !important;
-      font-weight: 700 !important;
-      font-size: 0.95rem !important;
-      font-family: 'Segoe UI', Tahoma, sans-serif !important;
-    }
-    :host ::ng-deep .invoice-row:hover {
-      background-color: #f1f8e9 !important;
-      transition: background-color 0.15s ease;
-    }
-    :host ::ng-deep .mat-mdc-row:nth-child(even) {
-      background-color: #fafafa;
-    }
+    :host ::ng-deep .mat-mdc-header-row { background-color: #fafafa !important; border-bottom: 2px solid #ddd !important; }
+    :host ::ng-deep .mat-mdc-header-cell { color: #111 !important; font-weight: 700 !important; font-size: 0.9rem !important; }
+    :host ::ng-deep .invoice-row:hover { background-color: #f9f9f9 !important; }
+    :host ::ng-deep .mat-mdc-row:nth-child(even) { background-color: #fdfdfd; }
   `]
 })
 export class InvoicesComponent implements OnInit {

@@ -21,7 +21,7 @@ import { InvoiceFilters } from '../../models/invoice.model';
     MatIconModule,
   ],
   template: `
-    <div class="filters-container flex flex-wrap gap-3 items-center p-4 bg-white rounded-xl shadow-sm mb-4">
+    <div class="filters-container">
       <!-- Client filter -->
       <mat-form-field appearance="outline" class="filter-field">
         <mat-label>اسم العميل</mat-label>
@@ -63,6 +63,15 @@ import { InvoiceFilters } from '../../models/invoice.model';
   styles: [`
     .filters-container {
       direction: rtl;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      padding: 16px;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      margin-bottom: 16px;
     }
     .filter-field {
       min-width: 180px;

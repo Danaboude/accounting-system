@@ -106,7 +106,7 @@ export interface InvoiceDialogData {
       display: flex;
       align-items: center;
       gap: 8px;
-      color: #006100;
+      color: #111;
       font-size: 1.3rem;
       padding: 16px 24px 0;
       direction: rtl;
