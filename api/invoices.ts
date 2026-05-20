@@ -64,9 +64,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         params
       );
 
+      const clientSummaryRes = await sql.query(
+        `SELECT
+           client_name,
+           COALESCE(SUM(CAST(total_amount AS FLOAT)), 0) AS total_amount,
+           COALESCE(SUM(CAST(paid_amount  AS FLOAT)), 0) AS paid_amount,
+           COALESCE(SUM(CAST(total_amount - paid_amount AS FLOAT)), 0) AS debt
+         FROM invoices ${where}
+         GROUP BY client_name
+         ORDER BY paid_amount DESC`,
+        params
+      );
+
       // Safely unwrap: .rows property (pg-style) OR direct array (neon-style)
       const invoicesRows: any[] = (invoicesRes as any).rows ?? invoicesRes;
       const statsRows:    any[] = (statsRes    as any).rows ?? statsRes;
+      const clientSummaryRows: any[] = (clientSummaryRes as any).rows ?? clientSummaryRes;
       const s = statsRows[0] ?? {};
 
       return res.status(200).json({
@@ -77,6 +90,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           totalPaid:   Number(s.total_paid   ?? 0),
           totalDebt:   Number(s.total_debt   ?? 0),
         },
+        clientSummary: clientSummaryRows.map((r: any) => ({
+          client_name: r.client_name,
+          total_amount: Number(r.total_amount),
+          paid_amount: Number(r.paid_amount),
+          debt: Number(r.debt)
+        }))
       });
     } catch (err: any) {
       console.error('GET /api/invoices error:', err);

@@ -9,9 +9,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatTabsModule } from '@angular/material/tabs';
 
 import { InvoiceService } from '../../services/invoice.service';
-import { Invoice, InvoiceFilters, InvoiceStats } from '../../models/invoice.model';
+import { Invoice, InvoiceFilters, InvoiceStats, ClientSummary } from '../../models/invoice.model';
 import { StatsCardsComponent } from '../../components/stats-cards/stats-cards.component';
 import { FiltersBarComponent } from '../../components/filters-bar/filters-bar.component';
 import { InvoiceFormComponent } from '../../components/invoice-form/invoice-form.component';
@@ -30,6 +31,7 @@ import { InvoiceFormComponent } from '../../components/invoice-form/invoice-form
     MatTooltipModule,
     MatChipsModule,
     MatDividerModule,
+    MatTabsModule,
     StatsCardsComponent,
     FiltersBarComponent,
   ],
@@ -79,7 +81,11 @@ import { InvoiceFormComponent } from '../../components/invoice-form/invoice-form
 
         <!-- Table Card -->
         <div class="table-card">
-          <!-- Table toolbar -->
+          <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+            
+            <!-- Tab 1: Invoices -->
+            <mat-tab label="تفاصيل الفواتير">
+              <!-- Table toolbar -->
           <div class="table-toolbar">
             <span class="table-count">
               <mat-icon>list</mat-icon>
@@ -183,6 +189,62 @@ import { InvoiceFormComponent } from '../../components/invoice-form/invoice-form
               </table>
             </div>
           }
+            </mat-tab>
+
+            <!-- Tab 2: Client Summary -->
+            <mat-tab label="ملخص العملاء">
+              <div class="table-toolbar">
+                <span class="table-count">
+                  <mat-icon>group</mat-icon>
+                  {{ clientSummary().length }} عملاء
+                </span>
+              </div>
+              <mat-divider></mat-divider>
+              
+              @if (clientSummary().length > 0) {
+                <div class="table-wrapper">
+                  <table mat-table [dataSource]="clientSummary()" class="invoices-table">
+                    
+                    <ng-container matColumnDef="client_name">
+                      <th mat-header-cell *matHeaderCellDef>اسم العميل</th>
+                      <td mat-cell *matCellDef="let row" class="client-cell">{{ row.client_name }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="total_amount">
+                      <th mat-header-cell *matHeaderCellDef class="col-amount">إجمالي الفواتير</th>
+                      <td mat-cell *matCellDef="let row" class="col-amount amount-cell">
+                        {{ row.total_amount | number:'1.2-2' }}
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="paid_amount">
+                      <th mat-header-cell *matHeaderCellDef class="col-amount">المقبوضات</th>
+                      <td mat-cell *matCellDef="let row" class="col-amount amount-cell paid-cell">
+                        {{ row.paid_amount | number:'1.2-2' }}
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="debt">
+                      <th mat-header-cell *matHeaderCellDef class="col-amount">الديون المتبقية</th>
+                      <td mat-cell *matCellDef="let row" class="col-amount"
+                        [class.debt-positive]="row.debt > 0"
+                        [class.debt-zero]="row.debt <= 0">
+                        {{ row.debt | number:'1.2-2' }}
+                      </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="['client_name', 'total_amount', 'paid_amount', 'debt']; sticky: true"></tr>
+                    <tr mat-row *matRowDef="let row; columns: ['client_name', 'total_amount', 'paid_amount', 'debt'];" class="invoice-row"></tr>
+                  </table>
+                </div>
+              } @else if (!loading()) {
+                <div class="empty-state">
+                  <mat-icon>group_off</mat-icon>
+                  <p>لا يوجد عملاء</p>
+                </div>
+              }
+            </mat-tab>
+          </mat-tab-group>
         </div>
       </div>
     </div>
@@ -294,6 +356,7 @@ export class InvoicesComponent implements OnInit {
 
   invoices = signal<Invoice[]>([]);
   stats = signal<InvoiceStats | null>(null);
+  clientSummary = signal<ClientSummary[]>([]);
   loading = signal(false);
   currentFilters = signal<InvoiceFilters>({});
 
@@ -313,6 +376,7 @@ export class InvoicesComponent implements OnInit {
       next: (response) => {
         this.invoices.set(response.invoices);
         this.stats.set(response.stats);
+        this.clientSummary.set(response.clientSummary || []);
         this.loading.set(false);
       },
       error: (err) => {
