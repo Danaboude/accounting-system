@@ -39,8 +39,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
 
-      // neon() used as a function (not template literal) for dynamic queries
-      const invoices = await sql(
+      // Use sql.query() for dynamic queries with $1, $2... placeholders
+      const invoicesRes = await sql.query(
         `SELECT
            id, invoice_number, client_name,
            CAST(total_amount  AS FLOAT) AS total_amount,
@@ -52,19 +52,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         params
       );
 
-      const statsArr = await sql(
+      const statsRes = await sql.query(
         `SELECT
-           COUNT(*)                                          AS total_count,
-           COALESCE(SUM(CAST(total_amount AS FLOAT)), 0)    AS total_amount,
-           COALESCE(SUM(CAST(paid_amount  AS FLOAT)), 0)    AS total_paid,
-           COALESCE(SUM(CAST(total_amount - paid_amount AS FLOAT)), 0) AS total_debt
+           COUNT(*)                                                        AS total_count,
+           COALESCE(SUM(CAST(total_amount AS FLOAT)), 0)                  AS total_amount,
+           COALESCE(SUM(CAST(paid_amount  AS FLOAT)), 0)                  AS total_paid,
+           COALESCE(SUM(CAST(total_amount - paid_amount AS FLOAT)), 0)    AS total_debt
          FROM invoices ${where}`,
         params
       );
 
-      const s = statsArr[0] as any;
+      const s = statsRes.rows[0] as any;
       return res.status(200).json({
-        invoices,
+        invoices: invoicesRes.rows,
         stats: {
           totalCount:  Number(s.total_count),
           totalAmount: Number(s.total_amount),
