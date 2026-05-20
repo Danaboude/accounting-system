@@ -10,7 +10,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).end();
   }
 
-  const sql = neon(process.env['DATABASE_URL']!);
+  const dbUrl = process.env['DATABASE_URL'] || process.env['POSTGRES_URL'];
+  if (!dbUrl) return res.status(500).json({ error: 'DATABASE_URL not configured' });
+  const sql = neon(dbUrl);
   const { id } = req.query;
   const invoiceId = parseInt(id as string, 10);
 
