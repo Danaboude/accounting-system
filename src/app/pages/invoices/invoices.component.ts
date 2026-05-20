@@ -537,7 +537,8 @@ export class InvoicesComponent implements OnInit {
   // ============ PDF PRINT ============
   printPDF() {
     import('jspdf').then(({ jsPDF }) => {
-      import('jspdf-autotable').then(() => {
+      import('jspdf-autotable').then((autoTableModule) => {
+        const autoTable = autoTableModule.default || (autoTableModule as any);
         const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
 
         // Title
@@ -566,7 +567,7 @@ export class InvoicesComponent implements OnInit {
           inv.invoice_date,
         ]);
 
-        (doc as any).autoTable({
+        autoTable(doc, {
           head: [['Invoice #', 'Client Name', 'Total Amount', 'Paid Amount', 'Debt', 'Date']],
           body: rows,
           startY: 34,
