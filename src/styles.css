@@ -1,3 +1,43 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import "tailwindcss";
+
+/* Angular Material theme */
+@import "@angular/material/prebuilt-themes/azure-blue.css";
+
+/* Global RTL & Arabic */
+html, body {
+  direction: rtl;
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f0f4f8;
+}
+
+/* Material overrides for RTL */
+.mat-mdc-form-field {
+  direction: rtl;
+}
+
+.mat-mdc-dialog-container {
+  direction: rtl;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #006100;
+  border-radius: 3px;
+}
+
+/* Number formatting for amounts */
+.amount-cell {
+  font-variant-numeric: tabular-nums;
+}
+
