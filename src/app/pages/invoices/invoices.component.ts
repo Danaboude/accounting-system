@@ -62,10 +62,10 @@ import { InvoiceFormComponent } from '../../components/invoice-form/invoice-form
               <mat-icon>table_view</mat-icon>
               تصدير
             </button>
-            <button mat-stroked-button (click)="printPDF()" matTooltip="طباعة PDF">
-              <mat-icon>print</mat-icon>
-              PDF
-            </button>
+            // <button mat-stroked-button (click)="printPDF()" matTooltip="طباعة PDF">
+            //   <mat-icon>print</mat-icon>
+            //   PDF
+            // </button>
             <button mat-flat-button color="primary" (click)="openAddDialog()">
               <mat-icon>add</mat-icon>
               فاتورة جديدة
