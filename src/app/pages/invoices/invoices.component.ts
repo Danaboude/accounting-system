@@ -11,6 +11,9 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTabsModule } from '@angular/material/tabs';
 
+// @ts-ignore
+import ArabicReshaper from 'arabic-reshaper';
+
 import { InvoiceService } from '../../services/invoice.service';
 import { Invoice, InvoiceFilters, InvoiceStats, ClientSummary } from '../../models/invoice.model';
 import { StatsCardsComponent } from '../../components/stats-cards/stats-cards.component';
@@ -534,6 +537,20 @@ export class InvoicesComponent implements OnInit {
     });
   }
 
+  // ============ ARABIC RESHAPER ============
+  processArabic(text: string | number): string {
+    if (text === null || text === undefined) return '';
+    const str = String(text);
+    const reshaped = ArabicReshaper.convertArabic(str);
+    const tokens = reshaped.split(/([a-zA-Z0-9./:\-\s|]+)/g);
+    return tokens.reverse().map((token: string) => {
+      if (/^[a-zA-Z0-9./:\-\s|]+$/.test(token)) {
+        return token;
+      }
+      return token.split('').reverse().join('');
+    }).join('');
+  }
+
   // ============ PDF PRINT ============
   printPDF() {
     import('jspdf').then(({ jsPDF }) => {
@@ -549,39 +566,46 @@ export class InvoicesComponent implements OnInit {
 
           // Title
           doc.setFontSize(18);
-          doc.text('تقرير الفواتير', 148, 15, { align: 'center' });
+          doc.text(this.processArabic('تقرير الفواتير'), 148, 15, { align: 'center' });
           doc.setFontSize(10);
-          doc.text(`التاريخ: ${new Date().toLocaleDateString('ar-EG')}`, 148, 22, { align: 'center' });
+          doc.text(this.processArabic(`التاريخ: ${new Date().toLocaleDateString('ar-EG')}`), 148, 22, { align: 'center' });
 
           // Stats
           const s = this.stats();
           if (s) {
             doc.setFontSize(10);
             doc.text(
-              `عدد الفواتير: ${s.totalCount}  |  إجمالي المبالغ: ${s.totalAmount.toFixed(2)}  |  المقبوضات: ${s.totalPaid.toFixed(2)}  |  الديون: ${s.totalDebt.toFixed(2)}`,
+              this.processArabic(`عدد الفواتير: ${s.totalCount}  |  إجمالي المبالغ: ${s.totalAmount.toFixed(2)}  |  المقبوضات: ${s.totalPaid.toFixed(2)}  |  الديون: ${s.totalDebt.toFixed(2)}`),
               148, 29, { align: 'center' }
             );
           }
 
           const rows = this.invoices().map(inv => [
-            inv.invoice_number.toString(),
-            inv.client_name,
-            inv.total_amount.toFixed(2),
-            inv.paid_amount.toFixed(2),
-            inv.debt.toFixed(2),
-            inv.invoice_date,
+            this.processArabic(inv.invoice_number),
+            this.processArabic(inv.client_name),
+            this.processArabic(inv.total_amount.toFixed(2)),
+            this.processArabic(inv.paid_amount.toFixed(2)),
+            this.processArabic(inv.debt.toFixed(2)),
+            this.processArabic(inv.invoice_date),
           ]);
 
           autoTable(doc, {
-            head: [['رقم الفاتورة', 'اسم العميل', 'اجمالي الفاتورة', 'المقبوضات', 'الديون', 'التاريخ']],
+            theme: 'grid',
+            head: [[
+              this.processArabic('رقم الفاتورة'),
+              this.processArabic('اسم العميل'),
+              this.processArabic('اجمالي الفاتورة'),
+              this.processArabic('المقبوضات'),
+              this.processArabic('الديون'),
+              this.processArabic('التاريخ')
+            ]],
             body: rows,
             startY: 34,
-            styles: { font: 'Amiri', fontStyle: 'normal', fontSize: 10, halign: 'center', cellPadding: 3, textColor: [0, 0, 0] },
+            styles: { font: 'Amiri', fontStyle: 'normal', fontSize: 10, halign: 'center', cellPadding: 3, textColor: [0, 0, 0], lineWidth: 0.2, lineColor: [0, 0, 0] },
             headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontStyle: 'normal', lineWidth: 0.2, lineColor: [0, 0, 0] },
             alternateRowStyles: { fillColor: [255, 255, 255] },
             tableLineColor: [0, 0, 0],
-            tableLineWidth: 0.1,
-            // Removed didParseCell to remove red/green background colors
+            tableLineWidth: 0.2,
           });
 
           doc.save(`فواتير_${new Date().toISOString().split('T')[0]}.pdf`);

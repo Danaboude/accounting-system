@@ -33,6 +33,7 @@
     "@angular/platform-browser": "^21.0.0",
     "@angular/router": "^21.0.0",
     "@neondatabase/serverless": "^1.1.0",
+    "arabic-reshaper": "^1.1.0",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
     "rxjs": "~7.8.0",
