@@ -2,6 +2,10 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners, LOCALE_ID } from
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { registerLocaleData } from '@angular/common';
+import localeAr from '@angular/common/locales/ar';
+
+registerLocaleData(localeAr, 'ar');
 
 import { routes } from './app.routes';
 
