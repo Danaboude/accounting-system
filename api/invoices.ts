@@ -40,6 +40,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
 
       // Use sql.query() for dynamic queries with $1, $2... placeholders
+      // Note: depending on @neondatabase/serverless version, result may be
+      // the rows array directly OR { rows: [...] } — handle both safely.
       const invoicesRes = await sql.query(
         `SELECT
            id, invoice_number, client_name,
@@ -62,14 +64,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         params
       );
 
-      const s = statsRes.rows[0] as any;
+      // Safely unwrap: .rows property (pg-style) OR direct array (neon-style)
+      const invoicesRows: any[] = (invoicesRes as any).rows ?? invoicesRes;
+      const statsRows:    any[] = (statsRes    as any).rows ?? statsRes;
+      const s = statsRows[0] ?? {};
+
       return res.status(200).json({
-        invoices: invoicesRes.rows,
+        invoices: invoicesRows,
         stats: {
-          totalCount:  Number(s.total_count),
-          totalAmount: Number(s.total_amount),
-          totalPaid:   Number(s.total_paid),
-          totalDebt:   Number(s.total_debt),
+          totalCount:  Number(s.total_count  ?? 0),
+          totalAmount: Number(s.total_amount ?? 0),
+          totalPaid:   Number(s.total_paid   ?? 0),
+          totalDebt:   Number(s.total_debt   ?? 0),
         },
       });
     } catch (err: any) {
