@@ -538,58 +538,66 @@ export class InvoicesComponent implements OnInit {
   printPDF() {
     import('jspdf').then(({ jsPDF }) => {
       import('jspdf-autotable').then((autoTableModule) => {
-        const autoTable = autoTableModule.default || (autoTableModule as any);
-        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        import('../../fonts/arabic-font').then(({ ARABIC_FONT }) => {
+          const autoTable = autoTableModule.default || (autoTableModule as any);
+          const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
 
-        // Title
-        doc.setFontSize(16);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Invoices Report', 148, 15, { align: 'center' });
-        doc.setFontSize(10);
-        doc.text(`Date: ${new Date().toLocaleDateString('ar-EG')}`, 148, 22, { align: 'center' });
+          // Add Arabic Font
+          doc.addFileToVFS('Amiri-Regular.ttf', ARABIC_FONT);
+          doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
+          doc.setFont('Amiri');
 
-        // Stats
-        const s = this.stats();
-        if (s) {
-          doc.setFontSize(9);
-          doc.text(
-            `Total Invoices: ${s.totalCount}  |  Total Amount: ${s.totalAmount.toFixed(2)}  |  Total Paid: ${s.totalPaid.toFixed(2)}  |  Total Debt: ${s.totalDebt.toFixed(2)}`,
-            148, 29, { align: 'center' }
-          );
-        }
+          // Title
+          doc.setFontSize(18);
+          doc.text('تقرير الفواتير', 148, 15, { align: 'center' });
+          doc.setFontSize(10);
+          doc.text(`التاريخ: ${new Date().toLocaleDateString('ar-EG')}`, 148, 22, { align: 'center' });
 
-        const rows = this.invoices().map(inv => [
-          inv.invoice_number.toString(),
-          inv.client_name,
-          inv.total_amount.toFixed(2),
-          inv.paid_amount.toFixed(2),
-          inv.debt.toFixed(2),
-          inv.invoice_date,
-        ]);
+          // Stats
+          const s = this.stats();
+          if (s) {
+            doc.setFontSize(10);
+            doc.text(
+              `عدد الفواتير: ${s.totalCount}  |  إجمالي المبالغ: ${s.totalAmount.toFixed(2)}  |  المقبوضات: ${s.totalPaid.toFixed(2)}  |  الديون: ${s.totalDebt.toFixed(2)}`,
+              148, 29, { align: 'center' }
+            );
+          }
 
-        autoTable(doc, {
-          head: [['Invoice #', 'Client Name', 'Total Amount', 'Paid Amount', 'Debt', 'Date']],
-          body: rows,
-          startY: 34,
-          styles: { fontSize: 9, halign: 'center' },
-          headStyles: { fillColor: [0, 97, 0], textColor: 255, fontStyle: 'bold' },
-          alternateRowStyles: { fillColor: [240, 248, 240] },
-          didParseCell: (data: any) => {
-            if (data.section === 'body' && data.column.index === 4) {
-              const debt = parseFloat(data.cell.raw);
-              if (debt > 0) {
-                data.cell.styles.fillColor = [255, 235, 238];
-                data.cell.styles.textColor = [198, 40, 40];
-              } else {
-                data.cell.styles.fillColor = [232, 245, 233];
-                data.cell.styles.textColor = [46, 125, 50];
+          const rows = this.invoices().map(inv => [
+            inv.invoice_number.toString(),
+            inv.client_name,
+            inv.total_amount.toFixed(2),
+            inv.paid_amount.toFixed(2),
+            inv.debt.toFixed(2),
+            inv.invoice_date,
+          ]);
+
+          autoTable(doc, {
+            head: [['رقم الفاتورة', 'اسم العميل', 'اجمالي الفاتورة', 'المقبوضات', 'الديون', 'التاريخ']],
+            body: rows,
+            startY: 34,
+            styles: { font: 'Amiri', fontSize: 10, halign: 'center', cellPadding: 3, textColor: [30, 30, 30] },
+            headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontStyle: 'bold', lineWidth: 0.2, lineColor: [200, 200, 200] },
+            alternateRowStyles: { fillColor: [250, 250, 250] },
+            tableLineColor: [200, 200, 200],
+            tableLineWidth: 0.1,
+            didParseCell: (data: any) => {
+              if (data.section === 'body' && data.column.index === 4) {
+                const debt = parseFloat(data.cell.raw);
+                if (debt > 0) {
+                  data.cell.styles.fillColor = [255, 240, 240];
+                  data.cell.styles.textColor = [198, 40, 40];
+                } else {
+                  data.cell.styles.fillColor = [240, 250, 240];
+                  data.cell.styles.textColor = [46, 125, 50];
+                }
               }
-            }
-          },
-        });
+            },
+          });
 
-        doc.save(`invoices_${new Date().toISOString().split('T')[0]}.pdf`);
-        this.snackBar.open('تم تصدير PDF بنجاح', 'إغلاق', { duration: 3000 });
+          doc.save(`فواتير_${new Date().toISOString().split('T')[0]}.pdf`);
+          this.snackBar.open('تم تصدير PDF بنجاح', 'إغلاق', { duration: 3000 });
+        });
       });
     });
   }
