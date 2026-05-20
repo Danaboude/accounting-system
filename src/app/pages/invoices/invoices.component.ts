@@ -576,23 +576,12 @@ export class InvoicesComponent implements OnInit {
             head: [['رقم الفاتورة', 'اسم العميل', 'اجمالي الفاتورة', 'المقبوضات', 'الديون', 'التاريخ']],
             body: rows,
             startY: 34,
-            styles: { font: 'Amiri', fontSize: 10, halign: 'center', cellPadding: 3, textColor: [30, 30, 30] },
-            headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontStyle: 'bold', lineWidth: 0.2, lineColor: [200, 200, 200] },
-            alternateRowStyles: { fillColor: [250, 250, 250] },
-            tableLineColor: [200, 200, 200],
+            styles: { font: 'Amiri', fontStyle: 'normal', fontSize: 10, halign: 'center', cellPadding: 3, textColor: [0, 0, 0] },
+            headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontStyle: 'normal', lineWidth: 0.2, lineColor: [0, 0, 0] },
+            alternateRowStyles: { fillColor: [255, 255, 255] },
+            tableLineColor: [0, 0, 0],
             tableLineWidth: 0.1,
-            didParseCell: (data: any) => {
-              if (data.section === 'body' && data.column.index === 4) {
-                const debt = parseFloat(data.cell.raw);
-                if (debt > 0) {
-                  data.cell.styles.fillColor = [255, 240, 240];
-                  data.cell.styles.textColor = [198, 40, 40];
-                } else {
-                  data.cell.styles.fillColor = [240, 250, 240];
-                  data.cell.styles.textColor = [46, 125, 50];
-                }
-              }
-            },
+            // Removed didParseCell to remove red/green background colors
           });
 
           doc.save(`فواتير_${new Date().toISOString().split('T')[0]}.pdf`);
